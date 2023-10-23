@@ -44,6 +44,10 @@ morgan.token("body", function (req, res) {
   return JSON.stringify(req.body);
 });
 
+app.get("/", (req, res) => {
+  res.sendFile(__dirname + "/index.html");
+});
+
 app.get("/api/persons", (req, res) => {
   res.json(persons);
 });
@@ -51,7 +55,7 @@ app.get("/api/persons", (req, res) => {
 app.get("/api/persons/:id", (req, res) => {
   const id = +req.params.id;
   const person = persons.find((person) => person.id === id);
-  person ? res.json(person) : res.status(400).end();
+  person ? res.json(person) : res.status(404).end();
 });
 
 app.get("/info", (req, res) => {
