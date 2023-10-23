@@ -44,10 +44,6 @@ morgan.token("body", function (req, res) {
   return JSON.stringify(req.body);
 });
 
-app.get("/", (req, res) => {
-  res.sendFile(__dirname + "/index.html");
-});
-
 app.get("/api/persons", (req, res) => {
   res.json(persons);
 });
