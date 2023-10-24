@@ -40,7 +40,7 @@ app.get("/info", (req, res) => {
   });
 });
 
-app.post("/api/persons", async (req, res) => {
+app.post("/api/persons", async (req, res, next) => {
   const body = req.body;
 
   if (!body.name || !body.number) {
@@ -53,7 +53,6 @@ app.post("/api/persons", async (req, res) => {
     // Check if a person with the same name or number already exists
     const existingPerson = await Person.findOne({ name: body.name });
     const existingNumber = await Person.findOne({ number: body.number });
-
     if (existingPerson) {
       return res.status(400).json({
         error: "This name already exists",
@@ -74,21 +73,18 @@ app.post("/api/persons", async (req, res) => {
     const savedPerson = await person.save();
     res.json(savedPerson);
   } catch (err) {
-    return res.status(500).json({
-      error: "Internal server error",
-    });
+    return next(err);
   }
 });
 
 app.put("/api/persons/:id", (req, res, next) => {
-  const body = req.body;
+  const { name, number } = req.body;
 
-  const person = {
-    name: body.name,
-    number: body.number,
-  };
-
-  Person.findByIdAndUpdate(req.params.id, person, { new: true })
+  Person.findByIdAndUpdate(
+    req.params.id,
+    { name, number },
+    { new: true, runValidators: true, context: "query" }
+  )
     .then((updatedPerson) => {
       res.json(updatedPerson);
     })
@@ -119,6 +115,8 @@ const errorHandler = (error, req, res, next) => {
 
   if (error.name === "CastError") {
     return res.status(400).send({ error: "malformatted id" });
+  } else if (error.name === "ValidationError") {
+    return res.status(400).json({ error: error.message });
   }
 
   next(error);
