@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const url = process.env.MONGODB_URI;
 
-console.log("connected to ", url);
+console.log("connecting to MongoDB");
 
 mongoose.set("strictQuery", false);
 mongoose
