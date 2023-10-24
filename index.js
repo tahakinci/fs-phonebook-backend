@@ -17,10 +17,12 @@ morgan.token("body", function (req, res) {
   return JSON.stringify(req.body);
 });
 
-app.get("/api/persons", (req, res) => {
-  Person.find({}).then((persons) => {
-    res.json(persons);
-  });
+app.get("/api/persons", (req, res, next) => {
+  Person.find({})
+    .then((persons) => {
+      res.json(persons);
+    })
+    .catch((err) => next(err));
 });
 
 app.get("/api/persons/:id", (req, res, next) => {
@@ -31,13 +33,15 @@ app.get("/api/persons/:id", (req, res, next) => {
     .catch((err) => next(err));
 });
 
-app.get("/info", (req, res) => {
-  Person.find({}).then((persons) => {
-    res.send(`
+app.get("/info", (req, res, next) => {
+  Person.find({})
+    .then((persons) => {
+      res.send(`
       <p>Phonebook has info for ${persons.length} people</p>
       <p>${new Date()}</p>
       `);
-  });
+    })
+    .catch((err) => next(err));
 });
 
 app.post("/api/persons", async (req, res, next) => {
